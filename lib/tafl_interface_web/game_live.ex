@@ -3,14 +3,15 @@ defmodule TaflInterfaceWeb.GameLive do
 
   alias TaflInterfaceWeb.Components.TaflComponents
   alias TaflEngine.GameSupervisor
-  # alias TaflEngine.Game
+  alias TaflEngine.Game
 
   def mount(_params, _session, socket) do
     socket =
       assign(socket,
         player: nil,
         registered: false,
-        games: refresh_game_list()
+        games: refresh_game_list(),
+        game: %{}
       )
 
     {:ok, socket}
@@ -22,7 +23,11 @@ defmodule TaflInterfaceWeb.GameLive do
     </pre>
 
     <%= if @registered do %>
-      <TaflComponents.gamelist list={@games} />
+      <%= if @game==%{} do %>
+        <TaflComponents.gamelist list={@games} player={@player} />
+      <% else %>
+        <TaflComponents.board gamelist={@games} player={@player} />
+      <% end %>
     <% else %>
       <TaflComponents.register player={@player} />
     <% end %>
@@ -36,24 +41,28 @@ defmodule TaflInterfaceWeb.GameLive do
   end
 
   def handle_event("create_game", _params, socket) do
-    player = socket.assigns.player
+    game_creator = socket.assigns.player
 
-    {:ok, gpid} = GameSupervisor.start_game(player)
+    {:ok, gpid} = GameSupervisor.start_game(game_creator)
+    # game = Game.via_tuple(game_creator)
+    gamestato = :sys.get_state(gpid)
 
-    IO.inspect(gpid, label: "---------------------------------------")
-
-    {:noreply, assign(socket, games: refresh_game_list())}
+    {:noreply, assign(socket, game: gamestato)}
   end
 
   def handle_event("join_game", %{"name" => x}, socket) do
-    IO.inspect(x, label: "_______^________")
-    IO.inspect(socket.assigns.player, label: "_______^________")
-    IO.inspect(self())
-    # game = Game.via_tuple(owner)
-    # Game.add_new_player(game, "whatever")
+    game_creator = x
+    new_player = socket.assigns.player
 
-    # {:noreply, assign(socket, game: :sys.get_state(game))}
-    {:noreply, socket}
+    game = Game.via_tuple(game_creator)
+    Game.add_new_player(game, new_player)
+
+    gamestato =
+      :sys.get_state(game)
+      |> IO.inspect()
+
+    {:noreply, assign(socket, game: gamestato)}
+    # {:noreply, socket}
   end
 
   defp refresh_game_list() do

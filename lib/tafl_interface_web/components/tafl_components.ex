@@ -14,11 +14,19 @@ defmodule TaflInterfaceWeb.Components.TaflComponents do
     <ul :for={name <- @list}>
       <li class="flex py-3">
         <%= name %>
-        <button class="px-3 leading-4 rounded-full " phx-click="join_game" phx-value-name={name}>
-          <span class="inline-flex items-center px-2 py-1 text-xs font-medium text-yellow-700 rounded-md bg-yellow-50 ring-1 ring-inset ring-yellow-600/20">
-            JOIN
-          </span>
-        </button>
+        <%= if name != @player do %>
+          <button class="px-3 leading-4 rounded-full " phx-click="join_game" phx-value-name={name}>
+            <span class="inline-flex items-center px-2 py-1 text-xs font-medium text-yellow-700 rounded-md bg-yellow-50 ring-1 ring-inset ring-yellow-600/20">
+              JOIN
+            </span>
+          </button>
+        <% else %>
+          <button class="px-3 leading-4 rounded-full ">
+            <span class="inline-flex items-center px-2 py-1 text-xs font-medium text-yellow-700 rounded-md bg-yellow-50 ring-1 ring-inset ring-yellow-600/20">
+              ...
+            </span>
+          </button>
+        <% end %>
       </li>
     </ul>
     """
@@ -33,11 +41,25 @@ defmodule TaflInterfaceWeb.Components.TaflComponents do
           label="player"
           name="player"
           value={@player}
-          placeholder="Create a Game by giving it a name"
+          placeholder="Player's Name"
           autocomplete="off"
           class="block w-full"
         />
       </form>
+    </div>
+    """
+  end
+
+  def board(assigns) do
+    ~H"""
+    <div>
+      <span>
+        You are playing as
+      </span>
+      <button>
+        Switch players
+      </button>
+      <%= inspect(@game) %>
     </div>
     """
   end
