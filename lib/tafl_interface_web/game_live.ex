@@ -8,6 +8,7 @@ defmodule TaflInterfaceWeb.GameLive do
     socket =
       assign(socket,
         player: nil,
+        my_turn: false,
         registered: false,
         games: Game.game_list(),
         game: %{}
@@ -25,7 +26,7 @@ defmodule TaflInterfaceWeb.GameLive do
       <%= if @game==%{} do %>
         <TaflComponents.gamelist list={@games} player={@player} />
       <% else %>
-        <TaflComponents.board game={@game} player={@player} />
+        <TaflComponents.board game={@game} player={@player} turn={@my_turn} />
       <% end %>
     <% else %>
       <TaflComponents.register player={@player} />
@@ -36,9 +37,13 @@ defmodule TaflInterfaceWeb.GameLive do
   end
 
   def handle_event("register", %{"player" => player}, socket) do
+    g = Game.find_game(player)
+
+    Game.subscribe(g.owner)
+
     {:noreply,
      assign(socket,
-       game: Game.find_game(player),
+       game: g,
        player: player,
        registered: true
      )}
@@ -77,6 +82,13 @@ defmodule TaflInterfaceWeb.GameLive do
   end
 
   def handle_info({:update_state, new_state}, socket) do
-    {:noreply, assign(socket, game: new_state)}
+    p1 = socket.assigns.player
+    p2 = Map.get(new_state, turn_of(new_state.rules.state))
+
+    {:noreply, assign(socket, game: new_state, my_turn: p1 == p2)}
+  end
+
+  defp turn_of(state_turn) do
+    "#{state_turn}" |> String.trim_trailing("_turn") |> String.to_atom()
   end
 end
