@@ -54,13 +54,14 @@ defmodule TaflInterfaceWeb.Components.TaflComponents do
     ~H"""
     <div>
       <span>
-        You are playing as <%= @player %>
+        <%= if @turn do %>
+          It is my turn! <%= @player %>
+        <% else %>
+          Wait, it is the other player's turn
+        <% end %>
       </span>
-      <%= if @game do %>
-        <div>
-          <%= inspect(@game.rules) %>
-        </div>
 
+      <%= if @game do %>
         <%= if @game.rules.state in [:initialized, :players_set] do %>
           <.button phx-click="flip_players">
             Switch players
@@ -80,8 +81,8 @@ defmodule TaflInterfaceWeb.Components.TaflComponents do
         <% end %>
       </div>
 
+      <hl />
       <%= inspect(@game, pretty: true) %>
-      <%= inspect(@turn, pretty: true) %>
     </div>
     """
   end
