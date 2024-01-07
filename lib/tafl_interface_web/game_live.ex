@@ -2,15 +2,14 @@ defmodule TaflInterfaceWeb.GameLive do
   use TaflInterfaceWeb, :live_view
 
   alias TaflInterfaceWeb.Components.TaflComponents
-  alias TaflEngine.GameSupervisor
-  alias TaflEngine.Game
+  alias TaflInterface.Game
 
   def mount(_params, _session, socket) do
     socket =
       assign(socket,
         player: nil,
         registered: false,
-        games: refresh_game_list(),
+        games: Game.game_list(),
         game: %{}
       )
 
@@ -26,7 +25,7 @@ defmodule TaflInterfaceWeb.GameLive do
       <%= if @game==%{} do %>
         <TaflComponents.gamelist list={@games} player={@player} />
       <% else %>
-        <TaflComponents.board gamelist={@games} player={@player} />
+        <TaflComponents.board game={@game} player={@player} />
       <% end %>
     <% else %>
       <TaflComponents.register player={@player} />
@@ -37,36 +36,47 @@ defmodule TaflInterfaceWeb.GameLive do
   end
 
   def handle_event("register", %{"player" => player}, socket) do
-    {:noreply, assign(socket, player: player, registered: true)}
+    {:noreply,
+     assign(socket,
+       game: Game.find_game(player),
+       player: player,
+       registered: true
+     )}
   end
 
   def handle_event("create_game", _params, socket) do
-    game_creator = socket.assigns.player
+    socket.assigns.player
+    |> Game.start_game()
+    |> Game.subscribe()
 
-    {:ok, gpid} = GameSupervisor.start_game(game_creator)
-    # game = Game.via_tuple(game_creator)
-    gamestato = :sys.get_state(gpid)
-
-    {:noreply, assign(socket, game: gamestato)}
+    {:noreply, socket}
   end
 
-  def handle_event("join_game", %{"name" => x}, socket) do
-    game_creator = x
-    new_player = socket.assigns.player
+  def handle_event("flip_players", _params, socket) do
+    socket.assigns.game.owner
+    |> Game.flip_players()
+    |> Game.broadcast_update()
 
-    game = Game.via_tuple(game_creator)
-    Game.add_new_player(game, new_player)
-
-    gamestato =
-      :sys.get_state(game)
-      |> IO.inspect()
-
-    {:noreply, assign(socket, game: gamestato)}
-    # {:noreply, socket}
+    {:noreply, socket}
   end
 
-  defp refresh_game_list() do
-    GameSupervisor.list_open_games()
-    |> Enum.map(fn x -> "#{x}" end)
+  def handle_event("join_game", %{"name" => game_owner}, socket) do
+    game_owner
+    |> Game.join_game(socket.assigns.player)
+    |> Game.subscribe()
+
+    {:noreply, socket}
+  end
+
+  def handle_event("start_the_game", _params, socket) do
+    socket.assigns.game.owner
+    |> Game.start_the_game()
+    |> Game.broadcast_update()
+
+    {:noreply, socket}
+  end
+
+  def handle_info({:update_state, new_state}, socket) do
+    {:noreply, assign(socket, game: new_state)}
   end
 end
