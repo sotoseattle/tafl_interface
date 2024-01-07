@@ -71,8 +71,29 @@ defmodule TaflInterfaceWeb.Components.TaflComponents do
         <% end %>
       <% end %>
 
+      <div class="grid grid-cols-9 gap-1 py-20">
+        <%= for x <- 1..9, y <- 1..9 do %>
+          <% [color, type] = moco(@game.board, x, y) %>
+          <div class={"h-16 py-5 text-xl text-center border-2 bg-#{color}-200"}>
+            <%= type %>
+          </div>
+        <% end %>
+      </div>
+
       <%= inspect(@game, pretty: true) %>
     </div>
     """
+  end
+
+  def moco(%{%TaflEngine.Cell{row: x, col: y} => v}, x, y) do
+    case v do
+      %TaflEngine.Piece{type: :pawn, color: :hunters} -> ["yellow", "P"]
+      %TaflEngine.Piece{type: :pawn} -> ["blue", "P"]
+      %TaflEngine.Piece{type: :king} -> ["blue", "K"]
+    end
+  end
+
+  def moco(_, _, _) do
+    ["", ""]
   end
 end

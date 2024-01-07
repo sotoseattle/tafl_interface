@@ -46,7 +46,7 @@ defmodule TaflInterfaceWeb.GameLive do
 
   def handle_event("create_game", _params, socket) do
     socket.assigns.player
-    |> Game.start_game()
+    |> Game.new_game()
     |> Game.subscribe()
 
     {:noreply, socket}

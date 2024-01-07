@@ -2,7 +2,7 @@ defmodule TaflInterface.Game do
   alias TaflEngine.Game
   alias TaflEngine.GameSupervisor
 
-  def start_game(game_owner) do
+  def new_game(game_owner) do
     GameSupervisor.start_game(game_owner)
     game_owner
   end
