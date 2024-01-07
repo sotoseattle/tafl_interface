@@ -3,3 +3,10 @@
 @import "tailwindcss/utilities";
 
 /* This file is for your main application CSS */
+.cell {
+    @apply h-16 py-5 text-xl text-center border-2;
+}
+
+.selected_cell {
+    @apply border-red-700 border-solid;
+}

@@ -54,16 +54,4 @@ defmodule TaflInterface.Game do
       {:update_state, Game.get_state(gpid)}
     )
   end
-
-  # def xoxo(socket) do
-  #   p1 = socket.assigns.player
-  #   turn = socket.assigns.game.rules.state |> String.trim_trailing("_turn")
-  #   p2 = Map.get(socket.game.rules, turn)
-
-  #   IO.puts("-----------------------------------------")
-  #   IO.puts(p1)
-  #   IO.puts(turn)
-  #   IO.puts(p2)
-  #   IO.puts("-----------------------------------------")
-  # end
 end

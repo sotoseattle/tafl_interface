@@ -61,21 +61,25 @@ defmodule TaflInterfaceWeb.Components.TaflComponents do
         <% end %>
       </span>
 
-      <%= if @game do %>
-        <%= if @game.rules.state in [:initialized, :players_set] do %>
-          <.button phx-click="flip_players">
-            Switch players
-          </.button>
-          <.button phx-click="start_the_game">
-            Start
-          </.button>
-        <% end %>
+      <%= if @game && @game.rules.state in [:initialized, :players_set] do %>
+        <.button phx-click="flip_players">
+          Switch players
+        </.button>
+        <.button phx-click="start_the_game">
+          Start
+        </.button>
       <% end %>
 
       <div class="grid grid-cols-9 gap-1 py-20">
-        <%= for x <- 1..9, y <- 1..9 do %>
+        <%= for x <- 9..1, y <- 1..9 do %>
           <% [color, type] = moco(@game.board, x, y) %>
-          <div class={"h-16 py-5 text-xl text-center border-2 #{color}"}>
+          <% selected = chocho(@from, "#{x}", "#{y}") %>
+          <div
+            class={"cell #{color} #{selected}"}
+            phx-value-row={x}
+            phx-value-col={y}
+            phx-click={if @turn, do: "select"}
+          >
             <%= type %>
           </div>
         <% end %>
@@ -95,7 +99,8 @@ defmodule TaflInterfaceWeb.Components.TaflComponents do
     end
   end
 
-  def moco(_, _, _) do
-    ["", ""]
-  end
+  def moco(_, _, _), do: ["", ""]
+
+  def chocho({x, y} = _from, x, y), do: "selected_cell"
+  def chocho(_, _, _), do: ""
 end

@@ -11,7 +11,8 @@ defmodule TaflInterfaceWeb.GameLive do
         my_turn: false,
         registered: false,
         games: Game.game_list(),
-        game: %{}
+        game: %{},
+        from: {nil, nil}
       )
 
     {:ok, socket}
@@ -26,7 +27,7 @@ defmodule TaflInterfaceWeb.GameLive do
       <%= if @game==%{} do %>
         <TaflComponents.gamelist list={@games} player={@player} />
       <% else %>
-        <TaflComponents.board game={@game} player={@player} turn={@my_turn} />
+        <TaflComponents.board game={@game} player={@player} turn={@my_turn} from={@from} />
       <% end %>
     <% else %>
       <TaflComponents.register player={@player} />
@@ -39,7 +40,9 @@ defmodule TaflInterfaceWeb.GameLive do
   def handle_event("register", %{"player" => player}, socket) do
     g = Game.find_game(player)
 
-    Game.subscribe(g.owner)
+    if Map.has_key?(g, :owner) do
+      Game.subscribe(g.owner)
+    end
 
     {:noreply,
      assign(socket,
@@ -77,6 +80,18 @@ defmodule TaflInterfaceWeb.GameLive do
     socket.assigns.game.owner
     |> Game.start_the_game()
     |> Game.broadcast_update()
+
+    {:noreply, socket}
+  end
+
+  def handle_event("select", %{"row" => row, "col" => col} = params, socket) do
+    # IO.puts("-------------------------------")
+    # IO.inspect(params)
+    # IO.puts("row: #{row}")
+    # IO.puts("col: #{col}")
+    # IO.puts("-------------------------------")
+
+    socket = assign(socket, from: {row, col})
 
     {:noreply, socket}
   end
