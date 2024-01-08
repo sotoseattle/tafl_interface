@@ -74,8 +74,9 @@ defmodule TaflInterfaceWeb.Components.TaflComponents do
         <%= for x <- 9..1, y <- 1..9 do %>
           <% [color, type] = moco(@game.board, x, y) %>
           <% selected = chocho(@from, "#{x}", "#{y}") %>
+          <% obstacles = sanctus(x, y) %>
           <div
-            class={"cell #{color} #{selected}"}
+            class={"cell #{color} #{selected} #{obstacles}"}
             phx-value-row={x}
             phx-value-col={y}
             phx-click={if @turn, do: "select"}
@@ -108,4 +109,11 @@ defmodule TaflInterfaceWeb.Components.TaflComponents do
 
   def chocho({x, y} = _from, x, y), do: "selected_cell"
   def chocho(_, _, _), do: ""
+
+  def sanctus(1, 1), do: "sanctuary"
+  def sanctus(1, 9), do: "sanctuary"
+  def sanctus(9, 1), do: "sanctuary"
+  def sanctus(9, 9), do: "sanctuary"
+  def sanctus(5, 5), do: "throne"
+  def sanctus(_, _), do: ""
 end

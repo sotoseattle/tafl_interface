@@ -89,9 +89,6 @@ defmodule TaflInterfaceWeb.GameLive do
         %{"row" => r2, "col" => c2},
         %{assigns: %{from: {r1, c1}}} = socket
       ) do
-    IO.puts("----- row: #{r2}")
-    IO.puts("----- col: #{c2}")
-
     xx = turn_of(socket.assigns.game.rules.state)
 
     socket.assigns.game.owner
@@ -101,12 +98,8 @@ defmodule TaflInterfaceWeb.GameLive do
     {:noreply, assign(socket, from: nil)}
   end
 
-  def handle_event("select", %{"row" => r1, "col" => c1} = _params, socket) do
-    IO.puts("?????????????")
-
-    socket = assign(socket, from: {r1, c1})
-
-    {:noreply, socket}
+  def handle_event("select", %{"row" => r1, "col" => c1} = _, socket) do
+    {:noreply, assign(socket, from: {r1, c1})}
   end
 
   def handle_info({:update_state, new_state}, socket) do
