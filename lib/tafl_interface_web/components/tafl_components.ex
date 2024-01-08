@@ -86,7 +86,12 @@ defmodule TaflInterfaceWeb.Components.TaflComponents do
       </div>
 
       <hl />
-      <%= inspect(@game, pretty: true) %>
+      <div>
+        <%= inspect(@game, pretty: true) %>
+      </div>
+      <div>
+        <%= inspect(@from) %>
+      </div>
     </div>
     """
   end

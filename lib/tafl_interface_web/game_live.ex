@@ -12,7 +12,7 @@ defmodule TaflInterfaceWeb.GameLive do
         registered: false,
         games: Game.game_list(),
         game: %{},
-        from: {nil, nil}
+        from: nil
       )
 
     {:ok, socket}
@@ -84,14 +84,27 @@ defmodule TaflInterfaceWeb.GameLive do
     {:noreply, socket}
   end
 
-  def handle_event("select", %{"row" => row, "col" => col} = params, socket) do
-    # IO.puts("-------------------------------")
-    # IO.inspect(params)
-    # IO.puts("row: #{row}")
-    # IO.puts("col: #{col}")
-    # IO.puts("-------------------------------")
+  def handle_event(
+        "select",
+        %{"row" => r2, "col" => c2},
+        %{assigns: %{from: {r1, c1}}} = socket
+      ) do
+    IO.puts("----- row: #{r2}")
+    IO.puts("----- col: #{c2}")
 
-    socket = assign(socket, from: {row, col})
+    xx = turn_of(socket.assigns.game.rules.state)
+
+    socket.assigns.game.owner
+    |> Game.move(xx, {r1, c1}, {r2, c2})
+    |> Game.broadcast_update()
+
+    {:noreply, assign(socket, from: nil)}
+  end
+
+  def handle_event("select", %{"row" => r1, "col" => c1} = _params, socket) do
+    IO.puts("?????????????")
+
+    socket = assign(socket, from: {r1, c1})
 
     {:noreply, socket}
   end

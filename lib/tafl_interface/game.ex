@@ -35,6 +35,17 @@ defmodule TaflInterface.Game do
     game_owner
   end
 
+  def move(game_owner, player, from, to) do
+    IO.puts("********* MOVING ********* #{player}")
+
+    game_owner
+    |> Game.via_tuple()
+    |> Game.move_piece(player, to_int(from), to_int(to))
+    |> IO.inspect()
+
+    game_owner
+  end
+
   def game_list() do
     GameSupervisor.list_open_games()
     |> Enum.map(fn x -> "#{x}" end)
@@ -53,5 +64,9 @@ defmodule TaflInterface.Game do
       game_owner,
       {:update_state, Game.get_state(gpid)}
     )
+  end
+
+  def to_int({x, y}) do
+    {String.to_integer(x), String.to_integer(y)}
   end
 end
