@@ -114,6 +114,5 @@ defmodule TaflInterfaceWeb.Components.TaflComponents do
   def sanctus(1, 9), do: "sanctuary"
   def sanctus(9, 1), do: "sanctuary"
   def sanctus(9, 9), do: "sanctuary"
-  def sanctus(5, 5), do: "throne"
   def sanctus(_, _), do: ""
 end

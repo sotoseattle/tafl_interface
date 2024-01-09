@@ -14,7 +14,3 @@
 .sanctuary {
     @apply bg-green-500;
 }
-
-.throne {
-    @apply bg-red-700;
-}
